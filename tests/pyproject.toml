@@ -1,8 +1,0 @@
-[tool.ruff]
-extend = "../pyproject.toml"
-
-[tool.ruff.lint]
-
-# select = ["ALL"]
-ignore = ["PLR2004", "ARG002"]
-# exclude = []
