@@ -1,43 +1,68 @@
-# CalDAV Instance-Based Calendar Sync
+# R2 Calendar Sync
 
-A robust calendar synchronization tool that handles both single events and recurring series between CalDAV calendars. This implementation treats all events as individual instances, avoiding the complexity of RRULE handling and working reliably with different CalDAV server implementations.
+A robust calendar synchronization tool that handles both regular calendar sync and privacy-preserving busy sync between CalDAV calendars (specifically Nextcloud and Kerio).
 
 ## Features
 
-- Syncs single events and recurring series between CalDAV calendars
-- Handles deletions in both directions
-- Detects and removes duplicate events
-- Uses UIDs and instance-specific dates for reliable matching
-- Works with both Nextcloud and Kerio CalDAV servers
-- Preserves all event properties and details
+- **Dual Sync Mode**:
+  - Regular 1:1 sync for work calendar (full event details)
+  - Privacy-preserving busy sync for personal calendars (only shows as "busy")
+
+- **Smart Event Handling**:
+  - Supports both single events and recurring series
+  - Handles event updates and deletions
+  - Detects and removes duplicate events
+  - Uses UIDs and instance-specific dates for reliable matching
+
+- **Privacy Features**:
+  - Converts personal calendar events to private "busy" blocks
+  - No event details are transferred for private events
+  - Maintains accurate availability information
+
+- **Wide Compatibility**:
+  - Works with Nextcloud CalDAV
+  - Works with Kerio CalDAV
+  - Extensible to other CalDAV servers
 
 ## Requirements
 
 - Python 3.6+
-- `caldav` library
-- `icalendar` library
-- `pytz` library
-- `python-dotenv` library
-
-Install required packages:
-```bash
-pip install caldav icalendar pytz python-dotenv
-```
+- Required Python packages (see `requirements.txt`):
+  - `caldav>=1.3.0`
+  - `icalendar>=5.0.0`
+  - `pytz>=2023.3`
+  - `python-dotenv>=1.0.0`
 
 ## Setup
 
-1. Clone this repository
-2. Copy the configuration template:
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/yourusername/r2-calendar-sync.git
+   cd r2-calendar-sync
+   ```
+
+2. Install required packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Copy the configuration template:
    ```bash
    cp config.env.example config.env
    ```
-3. Edit `config.env` and fill in your calendar credentials:
+
+4. Edit `config.env` and fill in your calendar credentials:
    ```env
    # Nextcloud configuration
    NEXTCLOUD_URL=https://your-nextcloud-server/remote.php/dav
    NEXTCLOUD_USERNAME=your_username
    NEXTCLOUD_PASSWORD=your_password
-   NEXTCLOUD_CALENDAR=calendar_name
+   NEXTCLOUD_PROSI_CALENDAR=ProSi
+
+   # Personal calendars for busy-only sync
+   NEXTCLOUD_PRIVATE_CALENDAR=Privat
+   NEXTCLOUD_R2SERVICES_CALENDAR=R2 Services
+   NEXTCLOUD_R2BRAIN_CALENDAR=R2 Brainworks
 
    # Kerio configuration
    KERIO_URL=https://your-kerio-server/caldav/
@@ -54,52 +79,48 @@ python run_instance_sync.py
 ```
 
 The script will:
-1. Connect to both calendars
-2. Clean up any duplicate events
-3. Sync all events from source to target
-4. Handle deletions (remove events in target that no longer exist in source)
+1. Connect to all configured calendars
+2. Perform regular 1:1 sync for the work calendar
+3. Perform busy sync for personal calendars
+4. Clean up any obsolete events
 
 ## How It Works
 
-This implementation takes a unique approach to calendar synchronization:
+### Regular Sync
+- Performs a full 1:1 sync of the work calendar
+- Preserves all event details and properties
+- Handles recurring events and series
+- Manages deletions and updates
 
-1. **Instance-Based Sync**: Instead of dealing with recurring event rules (RRULEs), it treats every event occurrence as an individual instance. This works reliably across different CalDAV servers that might handle recurring events differently.
+### Busy Sync
+- Converts personal calendar events to private "busy" events
+- Only shows time slots as occupied
+- No private event details are transferred
+- Maintains proper recurring event patterns
 
-2. **Event Matching**: 
-   - For recurring events: Matches instances using UID and RECURRENCE-ID
-   - For single events: Matches using UID, summary, and exact datetime
-
-3. **Duplicate Detection**: Identifies duplicates by comparing:
-   - Event summary (title)
-   - Full datetime (date AND time)
-   - Keeps the older version (lower sequence number)
-
-4. **Deletion Handling**: When events are deleted from the source calendar, they are automatically removed from the target calendar.
+### Event Matching
+- Uses unique identifiers (UIDs) to track events
+- For recurring events: Matches instances using UID and date
+- For single events: Matches using UID, summary, and datetime
+- Handles timezone differences properly
 
 ## Limitations
 
-- The sync is one-way (source → target)
-- Syncs events within a 120-day window (30 days past to 90 days future)
-- Both calendars must support the CalDAV protocol
-
-## Troubleshooting
-
-Common issues:
-
-1. **Connection Errors**:
-   - Verify your calendar URLs are correct
-   - Check your username and password
-   - Ensure you have network access to both servers
-
-2. **Calendar Not Found**:
-   - Verify the calendar names in your config match exactly
-   - Check case sensitivity
-
-3. **Sync Issues**:
-   - Check the logs for specific error messages
-   - Verify both calendars are accessible
-   - Ensure you have write permissions on the target calendar
+- One-way sync only (source → target)
+- Syncs events within a configurable time window (default: 1 year)
+- Both calendar servers must support CalDAV
+- Personal calendar events only show as "busy" in target calendar
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests! 
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- Original implementation by Frederike Reppekus
+- Inspired by various CalDAV sync implementations
+- Uses the excellent `caldav` Python library 

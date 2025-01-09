@@ -121,6 +121,9 @@ class CalendarSync:
             cal = Calendar.from_ical(event.data)
             for component in cal.walk('VEVENT'):
                 uid = str(component.get('uid', ''))
+                # Skip busy events
+                if uid.startswith('BUSY-') or component.get('X-BUSY-SYNC'):
+                    continue
                 if uid:
                     grouped[uid].append((event, component))
         return grouped
