@@ -38,8 +38,8 @@ class CalendarSync:
         
         # Then do the normal sync
         now = datetime.datetime.now(pytz.UTC)
-        start = now - datetime.timedelta(days=30)
-        end = now + datetime.timedelta(days=90)
+        start = now - datetime.timedelta(days=90)   # Keep 90 days of history
+        end = now + datetime.timedelta(days=365)    # Look ahead one full year
         
         source_events = self.source_calendar.date_search(start=start, end=end)
         target_events = self.target_calendar.date_search(start=start, end=end)
