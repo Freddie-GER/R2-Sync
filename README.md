@@ -1,126 +1,91 @@
-# R2 Calendar Sync
+# Calendar Sync Tool
 
-A robust calendar synchronization tool that handles both regular calendar sync and privacy-preserving busy sync between CalDAV calendars (specifically Nextcloud and Kerio).
+A robust Python-based calendar synchronization tool that enables secure and flexible synchronization between Nextcloud and Kerio CalDAV servers.
 
 ## Features
 
-- **Dual Sync Mode**:
-  - Regular 1:1 sync for work calendar (full event details)
-  - Privacy-preserving busy sync for personal calendars (only shows as "busy")
-
-- **Smart Event Handling**:
-  - Supports both single events and recurring series
-  - Handles event updates and deletions
-  - Detects and removes duplicate events
-  - Uses UIDs and instance-specific dates for reliable matching
-
-- **Privacy Features**:
-  - Converts personal calendar events to private "busy" blocks
-  - No event details are transferred for private events
-  - Maintains accurate availability information
-
-- **Wide Compatibility**:
-  - Works with Nextcloud CalDAV
-  - Works with Kerio CalDAV
-  - Extensible to other CalDAV servers
+- Two-way calendar synchronization between Nextcloud and Kerio
+- One-way synchronization with privacy mode (showing only "Busy" status)
+- Configurable through environment variables
+- Secure handling of sensitive calendar data
+- Support for multiple calendar pairs
 
 ## Requirements
 
-- Python 3.6+
-- Required Python packages (see `requirements.txt`):
-  - `caldav>=1.3.0`
-  - `icalendar>=5.0.0`
-  - `pytz>=2023.3`
-  - `python-dotenv>=1.0.0`
+- Python 3.9+
+- Access to Nextcloud and Kerio CalDAV servers
+- Required Python packages (see `requirements.txt`)
 
-## Setup
+## Installation
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/yourusername/r2-calendar-sync.git
-   cd r2-calendar-sync
-   ```
+1. Clone the repository:
+```bash
+git clone [your-repo-url]
+cd calendar-sync
+```
 
-2. Install required packages:
-   ```bash
-   pip install -r requirements.txt
-   ```
+2. Create and activate a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-3. Copy the configuration template:
-   ```bash
-   cp config.env.example config.env
-   ```
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-4. Edit `config.env` and fill in your calendar credentials:
-   ```env
-   # Nextcloud configuration
-   NEXTCLOUD_URL=https://your-nextcloud-server/remote.php/dav
-   NEXTCLOUD_USERNAME=your_username
-   NEXTCLOUD_PASSWORD=your_password
-   NEXTCLOUD_PROSI_CALENDAR=ProSi
+4. Copy the example environment file and configure your settings:
+```bash
+cp .env.example .env
+```
 
-   # Personal calendars for busy-only sync
-   NEXTCLOUD_PRIVATE_CALENDAR=Privat
-   NEXTCLOUD_R2SERVICES_CALENDAR=R2 Services
-   NEXTCLOUD_R2BRAIN_CALENDAR=R2 Brainworks
+## Configuration
 
-   # Kerio configuration
-   KERIO_URL=https://your-kerio-server/caldav/
-   KERIO_USERNAME=your_email
-   KERIO_PASSWORD=your_password
-   KERIO_CALENDAR=calendar_name
-   ```
+Edit the `.env` file with your calendar server details:
+
+```env
+# Nextcloud Configuration
+NEXTCLOUD_URL=https://your-nextcloud-server
+NEXTCLOUD_USERNAME=your-username
+NEXTCLOUD_PASSWORD=your-password
+
+# Kerio Configuration
+KERIO_URL=https://your-kerio-server
+KERIO_USERNAME=your-username
+KERIO_PASSWORD=your-password
+
+# Calendar Pairs Configuration
+# Format: source_calendar:target_calendar:sync_mode:privacy
+# sync_mode can be 'two_way' or 'one_way'
+# privacy is optional, set to 'true' for privacy mode
+CALENDAR_PAIRS=[
+    "personal@nextcloud:work@kerio:two_way:false",
+    "meetings@nextcloud:external@kerio:one_way:true"
+]
+```
 
 ## Usage
 
-Run the sync:
+Run the sync tool:
 ```bash
-python run_instance_sync.py
+python -m calendar_sync
 ```
 
-The script will:
-1. Connect to all configured calendars
-2. Perform regular 1:1 sync for the work calendar
-3. Perform busy sync for personal calendars
-4. Clean up any obsolete events
+## Security Notes
 
-## How It Works
-
-### Regular Sync
-- Performs a full 1:1 sync of the work calendar
-- Preserves all event details and properties
-- Handles recurring events and series
-- Manages deletions and updates
-
-### Busy Sync
-- Converts personal calendar events to private "busy" events
-- Only shows time slots as occupied
-- No private event details are transferred
-- Maintains proper recurring event patterns
-
-### Event Matching
-- Uses unique identifiers (UIDs) to track events
-- For recurring events: Matches instances using UID and date
-- For single events: Matches using UID, summary, and datetime
-- Handles timezone differences properly
-
-## Limitations
-
-- One-way sync only (source → target)
-- Syncs events within a configurable time window (default: 1 year)
-- Both calendar servers must support CalDAV
-- Personal calendar events only show as "busy" in target calendar
+- Privacy mode events are marked with specific identifiers and are excluded from two-way syncs
+- Sensitive calendar data is never exposed in privacy mode
+- All credentials are stored in environment variables, not in code
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Original implementation by Frederike Reppekus
-- Inspired by various CalDAV sync implementations
-- Uses the excellent `caldav` Python library 
+This project is licensed under the MIT License - see the LICENSE file for details. 
