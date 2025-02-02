@@ -9,14 +9,19 @@ A robust Python-based calendar synchronization tool that enables secure and flex
 - Configurable through environment variables
 - Secure handling of sensitive calendar data
 - Support for multiple calendar pairs
+- Calendar discovery mode for easy setup
 
 ## Requirements
 
 - Python 3.9+
 - Access to Nextcloud and Kerio CalDAV servers
-- Required Python packages (see `requirements.txt`)
+- Required Python packages (installed automatically via setup.py)
 
 ## Installation
+
+There are two ways to install the Calendar Sync Tool:
+
+### Method 1: Development Installation
 
 1. Clone the repository:
 ```bash
@@ -35,14 +40,29 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Copy the example environment file and configure your settings:
+### Method 2: Package Installation
+
+This method installs the tool as a command-line utility:
+
+1. Clone the repository and navigate to it
+2. Install using pip:
+```bash
+pip install .
+```
+
+This will:
+- Install all required dependencies
+- Create a `calendar-sync` command-line tool
+- Make the package available in your Python environment
+
+## Configuration
+
+1. Copy the example environment file:
 ```bash
 cp .env.example .env
 ```
 
-## Configuration
-
-Edit the `.env` file with your calendar server details:
+2. Edit the `.env` file with your calendar server details:
 
 ```env
 # Nextcloud Configuration
@@ -63,14 +83,45 @@ CALENDAR_PAIRS=[
     "personal@nextcloud:work@kerio:two_way:false",
     "meetings@nextcloud:external@kerio:one_way:true"
 ]
+
+# Optional Settings
+SYNC_INTERVAL_MINUTES=5  # Default is 5 minutes
+LOG_LEVEL=INFO          # Default is INFO
+PRIVACY_EVENT_TITLE=Busy  # Default is "Busy"
+PRIVACY_EVENT_PREFIX=PRIVACY-SYNC-  # Default prefix for privacy events
 ```
 
 ## Usage
 
-Run the sync tool:
+### Running the Sync Tool
+
+If installed via requirements.txt:
 ```bash
 python -m calendar_sync
 ```
+
+If installed as a package:
+```bash
+calendar-sync
+```
+
+### Discovery Mode
+
+To help set up your calendar pairs, use discovery mode:
+
+```bash
+# If installed via requirements.txt:
+python -m calendar_sync --discover
+
+# If installed as a package:
+calendar-sync --discover
+```
+
+Discovery mode will:
+1. Connect to your Nextcloud and Kerio servers
+2. List all available calendars
+3. Show the correct calendar IDs to use in your configuration
+4. Help you verify your server connections
 
 ## Security Notes
 
