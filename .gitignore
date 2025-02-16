@@ -47,4 +47,7 @@ Thumbs.db
 
 # Logs
 *.log
-logs/ 
+logs/
+
+# Google Calendar API credentials
+client_secret_571324167090-i9l373a0pn3amp4r055c7rfd5ool4bss.apps.googleusercontent.com.json 

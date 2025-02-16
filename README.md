@@ -139,4 +139,13 @@ Discovery mode will:
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Changelog
+
+### 2025-02-16
+
+- Implemented busy event filtering in two-way sync to exclude events with the title "Busy" from syncing, thus preventing privacy events from being synced from Kerio back to Nextcloud.
+- Updated the deletion logic for busy (privacy) events on both Google and Kerio calendars to handle events more gracefully.
+- Improved logging to better report deletion statuses (e.g., handling 404 responses as informational).
+- Updated the requirements file to reflect updated dependency versions for google-api-python-client, caldav, python-dotenv, and others. 

@@ -3,6 +3,7 @@
 import uuid
 from datetime import datetime
 from typing import Optional
+from collections.abc import Mapping
 
 from .caldav_client import CalendarEvent
 
@@ -44,8 +45,18 @@ class PrivacyEvent:
         """Check if an event is a privacy event."""
         return event.uid.startswith(self.prefix)
     
-    def get_source_uid(self, privacy_event: CalendarEvent) -> Optional[str]:
-        """Get the source event UID from a privacy event."""
-        if not self.is_privacy_event(privacy_event):
-            return None
-        return privacy_event.uid[len(self.prefix):] 
+    def get_source_uid(self, event):
+        # Only use dict-style access if event is exactly a dict
+        if type(event) is dict:
+            val = event.get('privacy_sync.uid')
+            if val:
+                return str(val)[len(self.prefix):]
+
+        # Otherwise, try to get UID as an attribute
+        uid = getattr(event, 'uid', None)
+        if uid:
+            uid_str = str(uid)
+            if uid_str.startswith(self.prefix):
+                return uid_str[len(self.prefix):]
+            return uid_str
+        raise ValueError("Event does not have a valid UID") 
