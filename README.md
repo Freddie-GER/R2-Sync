@@ -1,11 +1,12 @@
 # Calendar Sync Tool
 
-A robust Python-based calendar synchronization tool that enables secure and flexible synchronization between Nextcloud and Kerio CalDAV servers.
+A robust Python-based calendar synchronization tool that enables secure and flexible synchronization between Nextcloud, Kerio CalDAV servers, and Google Calendar.
 
 ## Features
 
 - Two-way calendar synchronization between Nextcloud and Kerio
 - One-way synchronization with privacy mode (showing only "Busy" status)
+- Google Calendar integration for one-way synchronization
 - Configurable through environment variables
 - Secure handling of sensitive calendar data
 - Support for multiple calendar pairs
@@ -15,6 +16,7 @@ A robust Python-based calendar synchronization tool that enables secure and flex
 
 - Python 3.9+
 - Access to Nextcloud and Kerio CalDAV servers
+- Google Calendar API credentials (for Google Calendar integration)
 - Required Python packages (installed automatically via setup.py)
 
 ## Installation
@@ -25,8 +27,8 @@ There are two ways to install the Calendar Sync Tool:
 
 1. Clone the repository:
 ```bash
-git clone [your-repo-url]
-cd calendar-sync
+git clone https://github.com/Freddie-GER/R2-Sync.git
+cd R2-Sync
 ```
 
 2. Create and activate a virtual environment:
@@ -52,8 +54,36 @@ pip install .
 
 This will:
 - Install all required dependencies
-- Create a `calendar-sync` command-line tool
+- Create a `r2-sync` command-line tool
 - Make the package available in your Python environment
+
+## Deployment Options (Alpha)
+
+For headless server deployment, we provide several options in the `deploy` directory:
+
+### Ubuntu Server Deployment
+
+We offer two deployment methods for Ubuntu servers:
+1. **Direct installation** with systemd service
+2. **Docker-based** containerized deployment
+
+See the `deploy/INSTALL_UBUNTU.md` file for detailed instructions.
+
+> **Note**: These deployment options are currently in alpha state and may require adjustments for your specific environment.
+
+### Automated Setup Script
+
+For easier deployment, you can use the provided setup script:
+
+```bash
+# Make the script executable
+chmod +x deploy/setup_ubuntu.sh
+
+# Run the setup script
+./deploy/setup_ubuntu.sh
+```
+
+The script will guide you through the installation process.
 
 ## Configuration
 
@@ -81,7 +111,8 @@ KERIO_PASSWORD=your-password
 # privacy is optional, set to 'true' for privacy mode
 CALENDAR_PAIRS=[
     "personal@nextcloud:work@kerio:two_way:false",
-    "meetings@nextcloud:external@kerio:one_way:true"
+    "meetings@nextcloud:external@kerio:one_way:true",
+    "personal@nextcloud:your-calendar@google:one_way:true"
 ]
 
 # Optional Settings
@@ -90,6 +121,16 @@ LOG_LEVEL=INFO          # Default is INFO
 PRIVACY_EVENT_TITLE=Busy  # Default is "Busy"
 PRIVACY_EVENT_PREFIX=PRIVACY-SYNC-  # Default prefix for privacy events
 ```
+
+### Google Calendar Configuration
+
+For Google Calendar integration:
+
+1. Create a project in the [Google Cloud Console](https://console.cloud.google.com/)
+2. Enable the Google Calendar API
+3. Create OAuth 2.0 credentials (Desktop application)
+4. Download the credentials JSON file and save it as `client_secret_*.json` in your project directory
+5. The first run will prompt for authentication to generate the token file
 
 ## Usage
 
@@ -102,7 +143,7 @@ python -m calendar_sync
 
 If installed as a package:
 ```bash
-calendar-sync
+r2-sync
 ```
 
 ### Discovery Mode
@@ -114,7 +155,7 @@ To help set up your calendar pairs, use discovery mode:
 python -m calendar_sync --discover
 
 # If installed as a package:
-calendar-sync --discover
+r2-sync --discover
 ```
 
 Discovery mode will:
@@ -128,6 +169,7 @@ Discovery mode will:
 - Privacy mode events are marked with specific identifiers and are excluded from two-way syncs
 - Sensitive calendar data is never exposed in privacy mode
 - All credentials are stored in environment variables, not in code
+- Google API credentials and tokens are stored locally and should be protected
 
 ## Contributing
 
@@ -143,7 +185,15 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Changelog
 
-### 2025-02-16
+### 2.1.0 (2025-03-13)
+
+- Implemented mass-deletion approach for privacy events on both Google and Kerio calendars
+- Improved error handling for 404 responses during event deletion
+- Enhanced logging to better report deletion statuses
+- Fixed issues with privacy event synchronization and cleanup
+- Updated Google Calendar integration to handle event deletion more effectively
+
+### 2.0.0 (2025-02-16)
 
 - Implemented busy event filtering in two-way sync to exclude events with the title "Busy" from syncing, thus preventing privacy events from being synced from Kerio back to Nextcloud.
 - Updated the deletion logic for busy (privacy) events on both Google and Kerio calendars to handle events more gracefully.

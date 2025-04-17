@@ -186,5 +186,14 @@ class GoogleCalendarClient:
 
     def list_calendars(self) -> list:
         """List all calendars accessible by the authenticated Google account."""
-        calendar_list = self.service.calendarList().list().execute()
-        return calendar_list.get('items', []) 
+        logger = logging.getLogger(__name__)
+        try:
+            calendar_list = self.service.calendarList().list().execute()
+            calendars = calendar_list.get('items', [])
+            logger.info("Available Google Calendars:")
+            for calendar in calendars:
+                logger.info(f"- {calendar['summary']} (ID: {calendar['id']})")
+            return calendars
+        except Exception as e:
+            logger.error(f"Failed to list Google calendars: {e}")
+            return [] 
